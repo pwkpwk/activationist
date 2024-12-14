@@ -20,7 +20,7 @@ public sealed class UnaryDictionary<TKey, TValue>(TKey key, TValue value) : IDic
     void ICollection<KeyValuePair<TKey, TValue>>.Clear() => throw new InvalidOperationException();
 
     bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item) =>
-        _keys.Contains(item.Key) && _values.Contains(item.Value);
+        _keys.ContainsItem(item.Key) && _values.ContainsItem(item.Value);
 
     void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) =>
         throw new NotImplementedException();
@@ -34,13 +34,13 @@ public sealed class UnaryDictionary<TKey, TValue>(TKey key, TValue value) : IDic
 
     void IDictionary<TKey, TValue>.Add(TKey key, TValue value) => throw new InvalidOperationException();
 
-    bool IDictionary<TKey, TValue>.ContainsKey(TKey key) => _keys.Contains(key);
+    bool IDictionary<TKey, TValue>.ContainsKey(TKey key) => _keys.ContainsItem(key);
 
     bool IDictionary<TKey, TValue>.Remove(TKey key) => throw new InvalidOperationException();
 
     bool IDictionary<TKey, TValue>.TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
     {
-        if (!_keys.Contains(key))
+        if (!_keys.ContainsItem(key))
         {
             value = default;
             return false;
@@ -52,7 +52,7 @@ public sealed class UnaryDictionary<TKey, TValue>(TKey key, TValue value) : IDic
 
     TValue IDictionary<TKey, TValue>.this[TKey key]
     {
-        get => _keys.Contains(key) ? _values.Value : throw new KeyNotFoundException();
+        get => _keys.ContainsItem(key) ? _values.Value : throw new KeyNotFoundException();
         set => throw new InvalidOperationException();
     }
 
@@ -64,6 +64,8 @@ public sealed class UnaryDictionary<TKey, TValue>(TKey key, TValue value) : IDic
     {
         private static IEqualityComparer<T>? _defaultComparer = EqualityComparer<T>.Default;
         public readonly T Value = value;
+        
+        public bool ContainsItem(T item) => DefaultComparer.Equals(item, Value);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => new UnaryEnumerator<T>(Value);
 
@@ -73,7 +75,7 @@ public sealed class UnaryDictionary<TKey, TValue>(TKey key, TValue value) : IDic
 
         void ICollection<T>.Clear() => throw new InvalidOperationException();
 
-        bool ICollection<T>.Contains(T item) => DefaultComparer.Equals(item, Value);
+        bool ICollection<T>.Contains(T item) => ContainsItem(item);
 
         void ICollection<T>.CopyTo(T[] array, int arrayIndex)
         {

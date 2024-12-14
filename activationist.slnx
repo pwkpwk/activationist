@@ -1,0 +1,7 @@
+﻿<Solution>
+  <Project Path="activationist.app\activationist.app.csproj" Type="Classic C#" />
+  <Project Path="activationist.benchmark\activationist.benchmark.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|Any CPU" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="activationist.test\activationist.test.csproj" Type="Classic C#" />
+</Solution>
