@@ -8,7 +8,6 @@ public class ValueReadOnlyDictionaryTests
     [Test]
     public void FromKeyAndValue_CorrectDictionary()
     {
-        IDictionary<int, int>? d = null;
         IReadOnlyDictionary<int, int> dictionary = new ValueReadOnlyDictionary<int, int>(new UnaryDictionary<int, int>(1, 1));
         
         Assert.Multiple(() =>

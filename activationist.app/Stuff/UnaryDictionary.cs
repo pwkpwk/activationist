@@ -3,13 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace activationist.app.Stuff;
 
-public sealed class UnaryDictionary<TKey, TValue>(
-    TKey key,
-    TValue value,
-    IEqualityComparer<TKey>? keyComparer = null) : IDictionary<TKey, TValue>
+public sealed class UnaryDictionary<TKey, TValue>(TKey key, TValue value) : IDictionary<TKey, TValue>
 {
-    private readonly ValueCollection<TKey> _keys = new(key, keyComparer);
-    private readonly ValueCollection<TValue> _values = new(value, null);
+    private readonly ValueCollection<TKey> _keys = new(key);
+    private readonly ValueCollection<TValue> _values = new(value);
 
     IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() =>
         new UnaryEnumerator<KeyValuePair<TKey, TValue>>(new(_keys.Value, _values.Value));
@@ -63,10 +60,9 @@ public sealed class UnaryDictionary<TKey, TValue>(
 
     ICollection<TValue> IDictionary<TKey, TValue>.Values => _values;
 
-    private readonly struct ValueCollection<T>(T value, IEqualityComparer<T>? comparer) : ICollection<T>
+    private readonly struct ValueCollection<T>(T value) : ICollection<T>
     {
-        private static readonly IEqualityComparer<T> DefaultComparer = EqualityComparer<T>.Default;
-        private readonly IEqualityComparer<T> _comparer = comparer ?? DefaultComparer;
+        private static IEqualityComparer<T>? _defaultComparer = EqualityComparer<T>.Default;
         public readonly T Value = value;
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => new UnaryEnumerator<T>(Value);
@@ -77,7 +73,7 @@ public sealed class UnaryDictionary<TKey, TValue>(
 
         void ICollection<T>.Clear() => throw new InvalidOperationException();
 
-        public bool Contains(T item) => _comparer.Equals(item, Value);
+        bool ICollection<T>.Contains(T item) => DefaultComparer.Equals(item, Value);
 
         void ICollection<T>.CopyTo(T[] array, int arrayIndex)
         {
@@ -89,6 +85,8 @@ public sealed class UnaryDictionary<TKey, TValue>(
         int ICollection<T>.Count => 1;
 
         bool ICollection<T>.IsReadOnly => true;
+        
+        private static IEqualityComparer<T> DefaultComparer => _defaultComparer ??= EqualityComparer<T>.Default;
     }
 
     private sealed class UnaryEnumerator<T>(T value) : IEnumerator<T>
