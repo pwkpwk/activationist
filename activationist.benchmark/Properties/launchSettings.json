@@ -7,7 +7,7 @@
     
     "Construction": {
       "commandName": "Project",
-      "commandLineArgs": "-m --disableLogFile -f *Construction*"
+      "commandLineArgs": "-m -r net8.0 net9.0 --disableLogFile -f *Construction*"
     },
     
     "Lookup": {
